@@ -9,8 +9,11 @@ const INVITE_COMMAND = {
 
 const APPLICATION_ID: string = process.env.APPLICATION_ID || "";
 const PUBLIC_KEY: string = process.env.PUBLIC_KEY || "";
+const url = new URL("/api/oauth2/authorize", "https://discord.com");
+url.searchParams.append("client_id", APPLICATION_ID);
+url.searchParams.append("permissions", JSON.stringify(["bot","applications.commands"]));
 
-const INVITE_URL = `https://discord.com/oauth2/authorize?client_id=${APPLICATION_ID}&scope=applications.commands`;
+const INVITE_URL: string = url.toString();
 
 const Handler: NextApiHandler = async (request, response) => {
     // Only respond to POST requests
@@ -29,7 +32,7 @@ const Handler: NextApiHandler = async (request, response) => {
 
         if (!isValidRequest) {
             console.error("Invalid Request");
-            return response.status(401).send({ error: "Bad request signature " });
+            return response.status(401).send({error: "Bad request signature "});
         }
 
         // Handle the request
@@ -44,6 +47,15 @@ const Handler: NextApiHandler = async (request, response) => {
         } else if (message.type === InteractionType.APPLICATION_COMMAND) {
             // Handle our Slash Commands
             switch (message.data.name.toLowerCase()) {
+                /*case SLAP_COMMAND.name.toLowerCase():
+                    response.status(200).send({
+                        type: 4,
+                        data: {
+                            content: "Hello!",
+                        },
+                    });
+                    console.log("Slap Request");
+                    break;*/
                 case INVITE_COMMAND.name.toLowerCase():
                     response.status(200).send({
                         type: 4,
@@ -56,12 +68,12 @@ const Handler: NextApiHandler = async (request, response) => {
                     break;
                 default:
                     console.error("Unknown Command");
-                    response.status(400).send({ error: "Unknown Type" });
+                    response.status(400).send({error: "Unknown Type"});
                     break;
             }
         } else {
             console.error("Unknown Type");
-            response.status(400).send({ error: "Unknown Type" });
+            response.status(400).send({error: "Unknown Type"});
         }
     } else {
         response.status(200).send({});
