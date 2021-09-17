@@ -34,3 +34,4 @@ yarn-error.log*
 .vercel
 .idea
 .run
+http-client.private.env.json
