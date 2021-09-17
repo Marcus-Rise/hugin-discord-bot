@@ -117,13 +117,6 @@ const Handler: NextApiHandler = async (request, response) => {
             // Handle our Slash Commands
             switch (message.data.name.toLowerCase()) {
                 case Commands.START:
-                    response.status(200).send({
-                        type: InteractionResponseType.CHANNEL_MESSAGE_WITH_SOURCE,
-                        data: {
-                            content: "Вальхалла ждет!",
-                            // flags: 64,
-                        },
-                    });
                     console.log("starting valheim server");
                     fetch("https://api.cloudvps.reg.ru/v1/reglets/" + REGRU_SERVER_ID + "/actions", {
                         method: "POST",
@@ -134,16 +127,28 @@ const Handler: NextApiHandler = async (request, response) => {
                         },
                     })
                         .then(res => res.json())
-                        .then(console.log)
+                        .then(res => {
+                            console.log(res);
+                            response.status(200).send({
+                                type: InteractionResponseType.CHANNEL_MESSAGE_WITH_SOURCE,
+                                data: {
+                                    content: "Вальхалла ждет!",
+                                    // flags: 64,
+                                },
+                            })
+                        })
+                        .catch(e => {
+                            console.error(e);
+                            response.status(200).send({
+                                type: InteractionResponseType.CHANNEL_MESSAGE_WITH_SOURCE,
+                                data: {
+                                    content: String(e),
+                                    // flags: 64,
+                                },
+                            });
+                        })
                     break;
                 case Commands.STOP:
-                    response.status(200).send({
-                        type: InteractionResponseType.CHANNEL_MESSAGE_WITH_SOURCE,
-                        data: {
-                            content: "Еще увидимся...",
-                            // flags: 64,
-                        },
-                    });
                     console.log("stopping valheim server");
                     fetch("https://api.cloudvps.reg.ru/v1/reglets/" + REGRU_SERVER_ID + "/actions", {
                         method: "POST",
@@ -154,7 +159,26 @@ const Handler: NextApiHandler = async (request, response) => {
                         },
                     })
                         .then(res => res.json())
-                        .then(console.log)
+                        .then(res => {
+                            console.log(res);
+                            response.status(200).send({
+                                type: InteractionResponseType.CHANNEL_MESSAGE_WITH_SOURCE,
+                                data: {
+                                    content: "Еще увидимся...",
+                                    // flags: 64,
+                                },
+                            });
+                        })
+                        .catch(e => {
+                            console.error(e);
+                            response.status(200).send({
+                                type: InteractionResponseType.CHANNEL_MESSAGE_WITH_SOURCE,
+                                data: {
+                                    content: String(e),
+                                    // flags: 64,
+                                },
+                            });
+                        })
                     break;
                 default:
                     console.error("Unknown Command");
