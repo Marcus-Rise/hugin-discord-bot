@@ -63,6 +63,8 @@ const Handler: NextApiHandler = async (request, response) => {
             console.error("Unknown Type");
             response.status(400).send({ error: "Unknown Type" });
         }
+    } else {
+        response.status(200).send({});
     }
 };
 
