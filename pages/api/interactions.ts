@@ -1,6 +1,5 @@
 import {NextApiHandler} from "next";
 import {InteractionResponseType, InteractionType, verifyKey} from "discord-interactions";
-import getRawBody from "raw-body";
 
 const INVITE_COMMAND = {
     name: "Invite",
@@ -11,17 +10,36 @@ const APPLICATION_ID: string = process.env.APPLICATION_ID || "";
 const PUBLIC_KEY: string = process.env.PUBLIC_KEY || "";
 const url = new URL("/api/oauth2/authorize", "https://discord.com");
 url.searchParams.append("client_id", APPLICATION_ID);
-url.searchParams.append("permissions", JSON.stringify(["bot","applications.commands"]));
+url.searchParams.append("permissions", JSON.stringify(["bot", "applications.commands"]));
 
 const INVITE_URL: string = url.toString();
+
+const config = {
+    api: {
+        bodyParser: false,
+    },
+}
 
 const Handler: NextApiHandler = async (request, response) => {
     // Only respond to POST requests
     if (request.method === "POST") {
         // Verify the request
+        // const rawBody = await getRawBody(request.body);
+        const rawBody = await new Promise<string>((resolve) => {
+            if (!request.body) {
+                let buffer = ''
+                request.on('data', (chunk) => {
+                    buffer += chunk
+                })
+
+                request.on('end', () => {
+                    // res.status(200).json(JSON.parse(Buffer.from(buffer).toString()))
+                    resolve(Buffer.from(buffer).toString());
+                })
+            }
+        });
         const signature = String(request.headers["x-signature-ed25519"]);
         const timestamp = String(request.headers["x-signature-timestamp"]);
-        const rawBody = await getRawBody(request);
 
         const isValidRequest = verifyKey(
             rawBody,
@@ -36,7 +54,7 @@ const Handler: NextApiHandler = async (request, response) => {
         }
 
         // Handle the request
-        const message = request.body;
+        const message = JSON.parse(rawBody);
 
         // Handle PINGs from Discord
         if (message.type === InteractionType.PING) {
@@ -47,15 +65,6 @@ const Handler: NextApiHandler = async (request, response) => {
         } else if (message.type === InteractionType.APPLICATION_COMMAND) {
             // Handle our Slash Commands
             switch (message.data.name.toLowerCase()) {
-                /*case SLAP_COMMAND.name.toLowerCase():
-                    response.status(200).send({
-                        type: 4,
-                        data: {
-                            content: "Hello!",
-                        },
-                    });
-                    console.log("Slap Request");
-                    break;*/
                 case INVITE_COMMAND.name.toLowerCase():
                     response.status(200).send({
                         type: 4,
@@ -81,3 +90,4 @@ const Handler: NextApiHandler = async (request, response) => {
 };
 
 export default Handler;
+export {config};
