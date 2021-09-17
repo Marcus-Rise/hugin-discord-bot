@@ -1,18 +1,60 @@
 import {NextApiHandler} from "next";
 import {InteractionResponseType, InteractionType, verifyKey} from "discord-interactions";
 
-const INVITE_COMMAND = {
-    name: "Invite",
-    description: "Get an invite link to add the bot to your server",
-};
+enum Commands {
+    START = "start",
+    STOP = "stop",
+}
+
+enum Roles {
+    JARL = "888462183875366962",
+}
+
+interface IMessage {
+    application_id: string;
+    channel_id: string;
+    data: {
+        id: string;
+        name: Commands;
+        type: number;
+    };
+    guild_id: string;
+    id: string;
+    member: {
+        avatar: null | unknown;
+        deaf: boolean;
+        is_pending: boolean;
+        joined_at: string;
+        mute: boolean;
+        /**
+         * server nick
+         */
+        nick: string;
+        pending: boolean;
+        permissions: string;
+        premium_since: null | unknown;
+        roles: string[];
+        user: {
+            avatar: string;
+            discriminator: string;
+            id: string;
+            public_flags: number;
+            username: string;
+        }
+    }
+    token: string;
+    type: InteractionType,
+    /**
+     * command version
+     */
+    version: string;
+}
 
 const APPLICATION_ID: string = process.env.APPLICATION_ID || "";
 const PUBLIC_KEY: string = process.env.PUBLIC_KEY || "";
 const url = new URL("/api/oauth2/authorize", "https://discord.com");
 url.searchParams.append("client_id", APPLICATION_ID);
 url.searchParams.append("permissions", JSON.stringify(["bot", "applications.commands"]));
-
-const INVITE_URL: string = url.toString();
 
 const config = {
     api: {
@@ -54,7 +96,7 @@ const Handler: NextApiHandler = async (request, response) => {
         }
 
         // Handle the request
-        const message = JSON.parse(rawBody);
+        const message: IMessage = JSON.parse(rawBody);
 
         // Handle PINGs from Discord
         if (message.type === InteractionType.PING) {
@@ -63,17 +105,35 @@ const Handler: NextApiHandler = async (request, response) => {
                 type: InteractionResponseType.PONG,
             });
         } else if (message.type === InteractionType.APPLICATION_COMMAND) {
+            if (!message.member.roles.includes(Roles.JARL)) {
+                return response.status(200).json({
+                    type: InteractionResponseType.CHANNEL_MESSAGE_WITH_SOURCE,
+                    data: {
+                        content: "Ты не похож на Ярла!"
+                    }
+                })
+            }
             // Handle our Slash Commands
             switch (message.data.name.toLowerCase()) {
-                case INVITE_COMMAND.name.toLowerCase():
+                case Commands.START:
                     response.status(200).send({
-                        type: 4,
+                        type: InteractionResponseType.CHANNEL_MESSAGE_WITH_SOURCE,
                         data: {
-                            content: INVITE_URL,
-                            flags: 64,
+                            content: "Вальхалла ждет!",
+                            // flags: 64,
                         },
                     });
-                    console.log("Invite request");
+                    console.log("starting valheim server");
+                    break;
+                case Commands.STOP:
+                    response.status(200).send({
+                        type: InteractionResponseType.CHANNEL_MESSAGE_WITH_SOURCE,
+                        data: {
+                            content: "Еще увидимся...",
+                            // flags: 64,
+                        },
+                    });
+                    console.log("stopping valheim server");
                     break;
                 default:
                     console.error("Unknown Command");
