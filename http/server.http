@@ -1,0 +1,29 @@
+###
+
+# curl
+#-X GET
+#-H "Authorization: Bearer $TOKEN"
+#-H "Content-Type: application/json"
+#'https://api.cloudvps.reg.ru/v1/reglets'
+GET https://api.cloudvps.reg.ru/v1/reglets
+Authorization: Bearer {{REGRU_TOKEN}}
+Content-Type: application/json
+
+###
+
+# curl
+#-X POST
+#-H "Authorization: Bearer $TOKEN"
+#-H "Content-Type: application/json"
+#-d '{"type": "start"}'
+#'https://api.cloudvps.reg.ru/v1/reglets/6867/actions'
+POST https://api.cloudvps.reg.ru/v1/reglets/{{REGRU_SERVER_ID}}/actions
+Authorization: Bearer {{REGRU_TOKEN}}
+Content-Type: application/json
+
+{
+  "type": "start"
+}
+
+###
+

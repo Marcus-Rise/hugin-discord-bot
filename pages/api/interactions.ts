@@ -50,6 +50,8 @@ interface IMessage {
     version: string;
 }
 
+const REGRU_TOKEN: string = process.env.REGRU_TOKEN || "";
+const REGRU_SERVER_ID: string = process.env.REGRU_SERVER_ID || "";
 const APPLICATION_ID: string = process.env.DISCORD_APPLICATION_ID || "";
 const PUBLIC_KEY: string = process.env.DISCORD_PUBLIC_KEY || "";
 const url = new URL("/api/oauth2/authorize", "https://discord.com");
@@ -124,6 +126,16 @@ const Handler: NextApiHandler = async (request, response) => {
                         },
                     });
                     console.log("starting valheim server");
+                    fetch("https://api.cloudvps.reg.ru/v1/reglets/" + REGRU_SERVER_ID + "/actions", {
+                        method: "POST",
+                        body: JSON.stringify({type: "start"}),
+                        headers: {
+                            Authorization: `Bearer ${REGRU_TOKEN}`,
+                            "Content-type": "application/json",
+                        },
+                    })
+                        .then(res => res.json())
+                        .then(console.log)
                     break;
                 case Commands.STOP:
                     response.status(200).send({
@@ -134,6 +146,16 @@ const Handler: NextApiHandler = async (request, response) => {
                         },
                     });
                     console.log("stopping valheim server");
+                    fetch("https://api.cloudvps.reg.ru/v1/reglets/" + REGRU_SERVER_ID + "/actions", {
+                        method: "POST",
+                        body: JSON.stringify({type: "stop"}),
+                        headers: {
+                            Authorization: `Bearer ${REGRU_TOKEN}`,
+                            "Content-type": "application/json",
+                        },
+                    })
+                        .then(res => res.json())
+                        .then(console.log)
                     break;
                 default:
                     console.error("Unknown Command");
