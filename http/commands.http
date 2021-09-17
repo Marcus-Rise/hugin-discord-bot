@@ -1,6 +1,6 @@
 # create start server command
-POST https://discord.com/api/v8/applications/{{APPLICATION_ID}}/guilds/{{GUILD_ID}}/commands
-Authorization: Bot {{TOKEN}}
+POST https://discord.com/api/v8/applications/{{DISCORD_APPLICATION_ID}}/guilds/{{DISCORD_GUILD_ID}}/commands
+Authorization: Bot {{DISCORD_TOKEN}}
 Content-Type: application/json
 
 {
@@ -10,8 +10,8 @@ Content-Type: application/json
 
 ###
 # create stop server command
-POST https://discord.com/api/v8/applications/{{APPLICATION_ID}}/guilds/{{GUILD_ID}}/commands
-Authorization: Bot {{TOKEN}}
+POST https://discord.com/api/v8/applications/{{DISCORD_APPLICATION_ID}}/guilds/{{DISCORD_GUILD_ID}}/commands
+Authorization: Bot {{DISCORD_TOKEN}}
 Content-Type: application/json
 
 {

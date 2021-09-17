@@ -50,8 +50,8 @@ interface IMessage {
     version: string;
 }
 
-const APPLICATION_ID: string = process.env.APPLICATION_ID || "";
-const PUBLIC_KEY: string = process.env.PUBLIC_KEY || "";
+const APPLICATION_ID: string = process.env.DISCORD_APPLICATION_ID || "";
+const PUBLIC_KEY: string = process.env.DISCORD_PUBLIC_KEY || "";
 const url = new URL("/api/oauth2/authorize", "https://discord.com");
 url.searchParams.append("client_id", APPLICATION_ID);
 url.searchParams.append("permissions", JSON.stringify(["bot", "applications.commands"]));
