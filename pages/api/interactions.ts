@@ -97,7 +97,6 @@ const Handler: NextApiHandler = async (request, response) => {
             return response.status(401).send({error: "Bad request signature "});
         }
 
-        // Handle the request
         const message: IMessage = JSON.parse(rawBody);
 
         // Handle PINGs from Discord
