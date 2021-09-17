@@ -1,0 +1,20 @@
+# create start server command
+POST https://discord.com/api/v8/applications/{{APPLICATION_ID}}/guilds/{{GUILD_ID}}/commands
+Authorization: Bot {{TOKEN}}
+Content-Type: application/json
+
+{
+  "name": "start",
+  "description": "Start valheim server"
+}
+
+###
+# create stop server command
+POST https://discord.com/api/v8/applications/{{APPLICATION_ID}}/guilds/{{GUILD_ID}}/commands
+Authorization: Bot {{TOKEN}}
+Content-Type: application/json
+
+{
+  "name": "stop",
+  "description": "Stop valheim server"
+}
