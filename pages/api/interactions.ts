@@ -118,7 +118,7 @@ const Handler: NextApiHandler = async (request, response) => {
             switch (message.data.name.toLowerCase()) {
                 case Commands.START:
                     console.log("starting valheim server");
-                    fetch("https://api.cloudvps.reg.ru/v1/reglets/" + REGRU_SERVER_ID + "/actions", {
+                    await fetch("https://api.cloudvps.reg.ru/v1/reglets/" + REGRU_SERVER_ID + "/actions", {
                         method: "POST",
                         body: JSON.stringify({type: "start"}),
                         headers: {
@@ -150,7 +150,7 @@ const Handler: NextApiHandler = async (request, response) => {
                     break;
                 case Commands.STOP:
                     console.log("stopping valheim server");
-                    fetch("https://api.cloudvps.reg.ru/v1/reglets/" + REGRU_SERVER_ID + "/actions", {
+                    await fetch("https://api.cloudvps.reg.ru/v1/reglets/" + REGRU_SERVER_ID + "/actions", {
                         method: "POST",
                         body: JSON.stringify({type: "stop"}),
                         headers: {
