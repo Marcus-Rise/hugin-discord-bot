@@ -1,5 +1,6 @@
 import {NextApiHandler} from "next";
 import {InteractionResponseType, InteractionType, verifyKey} from "discord-interactions";
+import {Regru} from "../../src/regru";
 
 enum Commands {
     START = "start",
@@ -50,8 +51,6 @@ interface IMessage {
     version: string;
 }
 
-const REGRU_TOKEN: string = process.env.REGRU_TOKEN || "";
-const REGRU_SERVER_ID: string = process.env.REGRU_SERVER_ID || "";
 const APPLICATION_ID: string = process.env.DISCORD_APPLICATION_ID || "";
 const PUBLIC_KEY: string = process.env.DISCORD_PUBLIC_KEY || "";
 const url = new URL("/api/oauth2/authorize", "https://discord.com");
@@ -118,15 +117,7 @@ const Handler: NextApiHandler = async (request, response) => {
             switch (message.data.name.toLowerCase()) {
                 case Commands.START:
                     console.log("starting valheim server");
-                    await fetch("https://api.cloudvps.reg.ru/v1/reglets/" + REGRU_SERVER_ID + "/actions", {
-                        method: "POST",
-                        body: JSON.stringify({type: "start"}),
-                        headers: {
-                            Authorization: `Bearer ${REGRU_TOKEN}`,
-                            "Content-type": "application/json",
-                        },
-                    })
-                        .then(res => res.json())
+                    await Regru.start()
                         .then(res => {
                             console.log(res);
                             response.status(200).send({
@@ -150,15 +141,7 @@ const Handler: NextApiHandler = async (request, response) => {
                     break;
                 case Commands.STOP:
                     console.log("stopping valheim server");
-                    await fetch("https://api.cloudvps.reg.ru/v1/reglets/" + REGRU_SERVER_ID + "/actions", {
-                        method: "POST",
-                        body: JSON.stringify({type: "stop"}),
-                        headers: {
-                            Authorization: `Bearer ${REGRU_TOKEN}`,
-                            "Content-type": "application/json",
-                        },
-                    })
-                        .then(res => res.json())
+                    await Regru.stop()
                         .then(res => {
                             console.log(res);
                             response.status(200).send({
