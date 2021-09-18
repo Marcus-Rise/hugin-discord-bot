@@ -4,7 +4,7 @@ import {verifyKey} from "discord-interactions";
 
 const PUBLIC_KEY: string = process.env.DISCORD_PUBLIC_KEY || "";
 
-const DiscordBotInterceptor = async (req: NextApiRequest, res: NextApiResponse): Promise<IDiscordBotMessage | void> => {
+const DiscordBotVerificationInterceptor = async (req: NextApiRequest, res: NextApiResponse): Promise<IDiscordBotMessage | void> => {
     if (req.method !== "POST") {
         return res.status(405).json("Method not allowed");
     }
@@ -41,4 +41,4 @@ const DiscordBotInterceptor = async (req: NextApiRequest, res: NextApiResponse):
     return JSON.parse(rawBody) as IDiscordBotMessage;
 }
 
-export {DiscordBotInterceptor}
+export {DiscordBotVerificationInterceptor}

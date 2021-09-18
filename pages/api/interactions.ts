@@ -1,7 +1,7 @@
 import {NextApiHandler} from "next";
 import {InteractionResponseType, InteractionType} from "discord-interactions";
 import {Regru} from "../../src/regru";
-import {DiscordBotCommandEnum, DiscordBotInterceptor} from "../../src/discord";
+import {DiscordBotCommandEnum, DiscordBotVerificationInterceptor} from "../../src/discord";
 
 enum Roles {
     JARL = "888462183875366962",
@@ -19,7 +19,7 @@ const config = {
 }
 
 const Handler: NextApiHandler = async (request, response) => {
-    const message = await DiscordBotInterceptor(request, response);
+    const message = await DiscordBotVerificationInterceptor(request, response);
 
     if (message) {
         // Handle PINGs from Discord
