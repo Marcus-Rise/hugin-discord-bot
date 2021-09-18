@@ -1,58 +1,13 @@
 import {NextApiHandler} from "next";
-import {InteractionResponseType, InteractionType, verifyKey} from "discord-interactions";
+import {InteractionResponseType, InteractionType} from "discord-interactions";
 import {Regru} from "../../src/regru";
-
-enum Commands {
-    START = "start",
-    STOP = "stop",
-}
+import {DiscordBotCommandEnum, DiscordBotInterceptor} from "../../src/discord";
 
 enum Roles {
     JARL = "888462183875366962",
 }
 
-interface IMessage {
-    application_id: string;
-    channel_id: string;
-    data: {
-        id: string;
-        name: Commands;
-        type: number;
-    };
-    guild_id: string;
-    id: string;
-    member: {
-        avatar: null | unknown;
-        deaf: boolean;
-        is_pending: boolean;
-        joined_at: string;
-        mute: boolean;
-        /**
-         * server nick
-         */
-        nick: string;
-        pending: boolean;
-        permissions: string;
-        premium_since: null | unknown;
-        roles: string[];
-        user: {
-            avatar: string;
-            discriminator: string;
-            id: string;
-            public_flags: number;
-            username: string;
-        }
-    }
-    token: string;
-    type: InteractionType,
-    /**
-     * command version
-     */
-    version: string;
-}
-
 const APPLICATION_ID: string = process.env.DISCORD_APPLICATION_ID || "";
-const PUBLIC_KEY: string = process.env.DISCORD_PUBLIC_KEY || "";
 const url = new URL("/api/oauth2/authorize", "https://discord.com");
 url.searchParams.append("client_id", APPLICATION_ID);
 url.searchParams.append("permissions", JSON.stringify(["bot", "applications.commands"]));
@@ -64,40 +19,9 @@ const config = {
 }
 
 const Handler: NextApiHandler = async (request, response) => {
-    // Only respond to POST requests
-    if (request.method === "POST") {
-        // Verify the request
-        // const rawBody = await getRawBody(request.body);
-        const rawBody = await new Promise<string>((resolve) => {
-            if (!request.body) {
-                let buffer = ''
-                request.on('data', (chunk) => {
-                    buffer += chunk
-                })
+    const message = await DiscordBotInterceptor(request, response);
 
-                request.on('end', () => {
-                    // res.status(200).json(JSON.parse(Buffer.from(buffer).toString()))
-                    resolve(Buffer.from(buffer).toString());
-                })
-            }
-        });
-        const signature = String(request.headers["x-signature-ed25519"]);
-        const timestamp = String(request.headers["x-signature-timestamp"]);
-
-        const isValidRequest = verifyKey(
-            rawBody,
-            signature,
-            timestamp,
-            PUBLIC_KEY,
-        );
-
-        if (!isValidRequest) {
-            console.error("Invalid Request");
-            return response.status(401).send({error: "Bad request signature "});
-        }
-
-        const message: IMessage = JSON.parse(rawBody);
-
+    if (message) {
         // Handle PINGs from Discord
         if (message.type === InteractionType.PING) {
             console.log("Handling Ping request");
@@ -115,7 +39,7 @@ const Handler: NextApiHandler = async (request, response) => {
             }
             // Handle our Slash Commands
             switch (message.data.name.toLowerCase()) {
-                case Commands.START:
+                case DiscordBotCommandEnum.START:
                     console.log("starting valheim server");
                     await Regru.start()
                         .then(res => {
@@ -139,7 +63,7 @@ const Handler: NextApiHandler = async (request, response) => {
                             });
                         })
                     break;
-                case Commands.STOP:
+                case DiscordBotCommandEnum.STOP:
                     console.log("stopping valheim server");
                     await Regru.stop()
                         .then(res => {
@@ -172,8 +96,6 @@ const Handler: NextApiHandler = async (request, response) => {
             console.error("Unknown Type");
             response.status(400).send({error: "Unknown Type"});
         }
-    } else {
-        response.status(200).send({});
     }
 };
 
